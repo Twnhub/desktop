@@ -13,7 +13,7 @@ import { Repository } from '../../../src/models/repository'
 import { setupEmptyRepositoryDefaultMain } from '../../helpers/repositories'
 import { makeCommit } from '../../helpers/repository-scaffolding'
 import { squash } from '../../../src/lib/git/squash'
-import { GitProcess } from 'dugite'
+import { exec } from 'dugite'
 import { getStatusOrThrow } from '../../helpers/status'
 import { getTempFilePath } from '../../../src/lib/file-system'
 
@@ -47,8 +47,13 @@ describe('git/cherry-pick', () => {
     expect(log.length).toBe(2)
 
     // verify squashed commit contains changes from squashed commits
-    const squashedFiles = await getChangedFiles(repository, squashed.sha)
-    const squashedFilePaths = squashedFiles.map(f => f.path).join(' ')
+    const squashedChangesetData = await getChangedFiles(
+      repository,
+      squashed.sha
+    )
+    const squashedFilePaths = squashedChangesetData.files
+      .map(f => f.path)
+      .join(' ')
     expect(squashedFilePaths).toContain('first.md')
     expect(squashedFilePaths).toContain('second.md')
   })
@@ -91,8 +96,13 @@ describe('git/cherry-pick', () => {
     expect(log.length).toBe(2)
 
     // verify squashed commit contains changes from squashed commits
-    const squashedFiles = await getChangedFiles(repository, squashed.sha)
-    const squashedFilePaths = squashedFiles.map(f => f.path).join(' ')
+    const squashedChangesetData = await getChangedFiles(
+      repository,
+      squashed.sha
+    )
+    const squashedFilePaths = squashedChangesetData.files
+      .map(f => f.path)
+      .join(' ')
     expect(squashedFilePaths).toContain('first.md')
     expect(squashedFilePaths).toContain('second.md')
     expect(squashedFilePaths).toContain('third.md')
@@ -123,8 +133,13 @@ describe('git/cherry-pick', () => {
     expect(log.length).toBe(1)
 
     // verify squashed commit contains changes from squashed commits
-    const squashedFiles = await getChangedFiles(repository, squashed.sha)
-    const squashedFilePaths = squashedFiles.map(f => f.path).join(' ')
+    const squashedChangesetData = await getChangedFiles(
+      repository,
+      squashed.sha
+    )
+    const squashedFilePaths = squashedChangesetData.files
+      .map(f => f.path)
+      .join(' ')
     expect(squashedFilePaths).toContain('initialize')
     expect(squashedFilePaths).toContain('first.md')
     expect(squashedFilePaths).toContain('second.md')
@@ -169,8 +184,13 @@ describe('git/cherry-pick', () => {
     expect(log.length).toBe(4)
 
     // verify squashed commit contains changes from squashed commits
-    const squashedFiles = await getChangedFiles(repository, squashed.sha)
-    const squashedFilePaths = squashedFiles.map(f => f.path).join(' ')
+    const squashedChangesetData = await getChangedFiles(
+      repository,
+      squashed.sha
+    )
+    const squashedFilePaths = squashedChangesetData.files
+      .map(f => f.path)
+      .join(' ')
     expect(squashedFilePaths).toContain('first.md')
     expect(squashedFilePaths).toContain('third.md')
     expect(squashedFilePaths).toContain('fifth.md')
@@ -204,7 +224,7 @@ describe('git/cherry-pick', () => {
     let { files } = status.workingDirectory
 
     // resolve conflicts by adding the conflicting file
-    await GitProcess.exec(
+    await exec(
       ['add', Path.join(repository.path, 'second.md')],
       repository.path
     )
@@ -257,8 +277,13 @@ describe('git/cherry-pick', () => {
     expect(squashed.body).toBe('Test Body\n')
 
     // verify squashed commit contains changes from squashed commits
-    const squashedFiles = await getChangedFiles(repository, squashed.sha)
-    const squashedFilePaths = squashedFiles.map(f => f.path).join(' ')
+    const squashedChangesetData = await getChangedFiles(
+      repository,
+      squashed.sha
+    )
+    const squashedFilePaths = squashedChangesetData.files
+      .map(f => f.path)
+      .join(' ')
     expect(squashedFilePaths).toContain('first.md')
     expect(squashedFilePaths).toContain('second.md')
   })
